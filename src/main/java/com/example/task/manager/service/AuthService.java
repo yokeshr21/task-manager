@@ -13,19 +13,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public String validateUser(String username, String password){
-        Optional<Users> userOpt = userRepository.findByUsername(username);
-
-        if(userOpt.isEmpty()){
-            return "Username not found";
-        }
-
-        Users users = userOpt.get();
-
-        if(!users.getPassword().equals(password)){
-            return "Invalid password";
-        }
-
-        return "Login successful";
+    public boolean validateUser(String username, String password){
+        return userRepository.findByUsernameAndPassword(username, password).isPresent();
     }
 }

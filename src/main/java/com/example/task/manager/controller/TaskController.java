@@ -1,7 +1,9 @@
 package com.example.task.manager.controller;
 
+import com.example.task.manager.exception.ResourceNotFoundException;
 import com.example.task.manager.model.Task;
 import com.example.task.manager.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,21 +25,29 @@ public class TaskController {
         return taskService.getAllTasks();
     }
 
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<Task> getById(@PathVariable Long id){
-        Optional<Task> task = taskService.getTaskById(id);
+//    @GetMapping("/getById/{id}")
+//    public ResponseEntity<Task> getById(@PathVariable Long id){
+//        Optional<Task> task = taskService.getTaskById(id);
+//
+//        if(task.isPresent()){
+//            return new ResponseEntity<>(task.get(), HttpStatus.OK);
+//        }
+//        else{
+//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+//        }
+//    }
 
-        if(task.isPresent()){
-            return new ResponseEntity<>(task.get(), HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Task> getById(@PathVariable Long id) {
+        Task task = taskService.getTaskById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with ID " + id + " not found"));
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
+
 
     @PostMapping("/saveTask")
     @ResponseStatus(HttpStatus.CREATED)
-    public Task saveTask(@RequestBody Task task){
+    public Task saveTask(@Valid @RequestBody Task task){
         return taskService.createTask(task);
     }
 

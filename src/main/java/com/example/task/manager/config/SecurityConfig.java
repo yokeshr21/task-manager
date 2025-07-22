@@ -1,39 +1,32 @@
 package com.example.task.manager.config;
 
+import com.example.task.manager.util.JwtAuthFilter;
 import jakarta.annotation.ManagedBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
-public class
-SecurityConfig {
+public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http
-                .csrf(csrf -> csrf.disable())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtFilter) throws Exception{
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/auth/login").permitAll()
                 .anyRequest().authenticated())
-        .httpBasic(Customizer.withDefaults());
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class);
 
     return http.build();
     }
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new InMemoryUserDetailsManager(
-                User.withUsername("admin")
-                        .password("{noop}admin123")
-                        .roles("ADMIN")
-                        .build()
-        );
-    }
-
 }
