@@ -32,6 +32,10 @@ public class Task {
 
     private LocalDateTime updatedAt;
 
+    private String filePath;
+
+    private String fileName;
+
     @PrePersist
     protected void onCreate(){
         createdAt = LocalDateTime.now();
