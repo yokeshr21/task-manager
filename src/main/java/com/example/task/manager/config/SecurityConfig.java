@@ -18,13 +18,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtFilter) throws Exception{
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {} )
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login").permitAll()
-                .anyRequest().authenticated())
-
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                         .requestMatchers("/auth/login").permitAll()
+                         .requestMatchers("/Taskmanager/tasks/**").authenticated()
+                         .anyRequest().permitAll()
+                )
                 .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class);
 
     return http.build();
